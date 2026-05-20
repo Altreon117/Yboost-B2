@@ -1,17 +1,27 @@
 import streamlit as st
-import pickle
+import joblib
 import os
 
-st.title("Prédiction d'affluence RER A")
+st.title("🚇 Prédiction d'affluence RER A")
 
-# Chemin vers le modèle à l'intérieur du conteneur Docker
-chemin_modele = "models/modele_trafic.pkl"
+# Chemins vers les fichiers d'Aurel
+chemin_modele = "models/meilleur_modele_rera.pkl"
+chemin_scaler = "models/scaler_rera.pkl"
 
-# Pipeline de chargement sécurisé
-if os.path.exists(chemin_modele):
-    with open(chemin_modele, 'rb') as file:
-        modele = pickle.load(file)
-    st.success("Modèle d'IA chargé avec succès depuis le conteneur !")
-    # Ici, l'étudiant 4 fera ses st.selectbox pour la météo, l'heure, etc.
+# Fonction pour charger un fichier exporté avec joblib
+def charger_fichier_ia(chemin):
+    if os.path.exists(chemin):
+        # joblib lit directement le fichier sans avoir besoin de faire un 'open()'
+        return joblib.load(chemin)
+    return None
+
+# Chargement du Scaler et du Modèle
+modele = charger_fichier_ia(chemin_modele)
+scaler = charger_fichier_ia(chemin_scaler)
+
+# Vérification pour l'interface
+if modele and scaler:
+    st.success("✅ Modèle d'IA et Scaler chargés avec succès via Joblib !")
+    st.write("Le pipeline est prêt ! Thibaud peut maintenant ajouter les filtres (Météo, Heure, etc.) et coder la fonction de prédiction.")
 else:
-    st.warning("⏳ En attente du modèle de l'étudiant 2. Le pipeline est prêt.")
+    st.error("❌ Fichiers introuvables. Vérifie qu'ils sont bien dans le dossier 'models/'.")
