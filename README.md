@@ -1,105 +1,80 @@
-# 🚇 Yboost — Télémétrie RER A
+# Yboost — Télémétrie RER A
 
 Interface de prédiction d'affluence pour les gares du RER A (Île-de-France),
 propulsée par un modèle **MLPRegressor** entraîné sur les données de validation.
 
 ---
 
-## ✨ Fonctionnalités
+## Fonctionnalités
 
-- 📊 **Courbe horaire 24H** — affluence estimée tranche par tranche
-- 🌡️ **Heatmap d'intensité** — visualisation rapide de la charge journalière
-- 📈 **KPIs temps réel** — pic, total journalier, indice de concentration
-- 🏆 **Top 8 tranches critiques** — classement avec barres de progression
-- 🌦️ **Prise en compte météo** — température, pluie, vent
-- 🗓️ **Types de jours** — Semaine / Samedi / Dimanche & Jours fériés
-- 🚉 **54 gares** du RER A couvertes
+-  **Courbe horaire 24H** — affluence estimée tranche par tranche
+-  **Heatmap d'intensité** — visualisation rapide de la charge journalière
+-  **KPIs temps réel** — pic, total journalier, indice de concentration
+-  **Top 8 tranches critiques** — classement avec barres de progression
+-  **Prise en compte météo** — température, pluie, vent
+-  **Types de jours** — Semaine / Samedi / Dimanche & Jours fériés
+-  **54 gares** du RER A couvertes
 
 ---
 
-## 🚀 Installation
+## Architecture du Projet
 
+L'environnement est isolé et standardisé pour intégrer les fichiers de modèle fournis par Aurel :
+
+```text
+yboost_local/
+├── Dockerfile                  # Recette de construction du conteneur Linux
+├── requirements.txt            # Dépendances Python strictes (alignées sur Colab)
+├── app.py                      # Point d'entrée de l'application Streamlit (épuré)
+└── models/                     # Artefacts d'apprentissage automatique
+    ├── meilleur_modele_rera.pkl # Modèle MLPRegressor entraîné (Aurel)
+    └── scaler_rera.pkl         # Scaler pour la normalisation des entrées (Aurel)
+```
+
+---
+
+## Spécifications Techniques & DevOps
+
+Pour éviter "l'enfer des dépendances" et garantir une compatibilité totale entre architectures matérielles (Mac ARM / Windows x86), l'environnement a été rigoureusement aligné sur l'environnement de génération d'Aurel (Google Colab) :
+* **Base Image :** `Python 3.12-slim` (requis pour décoder le BitGenerator `MT19937` de NumPy créé sous Python 3.12).
+* **Axe IA Synchrone :** Les versions de `scikit-learn==1.6.1` et `numpy==2.0.2` sont verrouillées pour éviter le crash au chargement avec `joblib`.
+
+---
+
+## Installation & Lancement via Docker (Serveur Local)
+
+Assurez-vous que **Docker Desktop** est démarré sur votre machine avant de lancer les commandes.
+
+### 1. Cloner et se placer sur la bonne branche
 ```bash
-# Cloner le projet
-git clone <url-du-repo>
-cd yboost_project
-
-# Créer l'environnement virtuel
-python -m venv venv
-source venv/bin/activate      # macOS / Linux
-venv\Scripts\activate         # Windows
-
-# Installer les dépendances
-pip install -r requirements.txt
+git clone <url-du-depot>
+git checkout environnement
 ```
 
-### Ajouter les modèles IA
-
-Placer les fichiers `.pkl` (générés depuis le notebook Colab) dans `models/` :
-
-```
-models/
-├── meilleur_modele_rera.pkl
-└── scaler_rera.pkl
-```
-
----
-
-## ▶️ Lancement
-
+### 2. Construire l'image Docker
+Cette commande prépare la bulle isolée et installe toutes les bibliothèques sans utiliser de cache pour forcer l'application des bonnes versions :
 ```bash
-streamlit run app.py
+docker build --no-cache -t yboost-serveur .
 ```
 
-L'application est accessible sur `http://localhost:8501`
+### 3. Allumer le serveur avec rechargement à chaud (Volume)
+Pour permettre à **Thibaud** de développer l'interface visuelle en direct sans devoir reconstruire le conteneur à chaque modification, on lie le dossier local au conteneur.
 
----
-
-## 🧪 Tests
-
+#### Sur macOS (Terminal / Zsh) :
 ```bash
-pytest tests/ -v
+docker run -p 8501:8501 -v $(pwd):/app yboost-serveur
 ```
 
----
-
-## 🏗️ Architecture
-
-```
-yboost_project/
-├── app.py              → Orchestrateur (point d'entrée)
-├── requirements.txt
-├── src/
-│   ├── config.py       → Constantes globales
-│   ├── model.py        → Chargement IA + prédictions
-│   ├── ui.py           → Composants visuels
-│   ├── components/     → Composants réutilisables
-│   └── utils/
-│       └── patch_numpy.py  → Patch compatibilité NumPy
-├── models/             → Fichiers .pkl (non versionnés)
-├── assets/             → Ressources statiques
-├── tests/              → Tests unitaires
-└── docs/               → Documentation technique
+#### Sur Windows (PowerShell) :
+```powershell
+docker run -p 8501:8501 -v ${PWD}:/app yboost-serveur
 ```
 
-Voir [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) pour le détail complet.
+#### Sur Windows (Invite de commandes classique - CMD) :
+```cmd
+docker run -p 8501:8501 -v %cd%:/app yboost-serveur
+```
+
+L'application est instantanément accessible sur **[http://localhost:8501](http://localhost:8501)**.
 
 ---
-
-## ⚙️ Stack technique
-
-| Composant     | Technologie              |
-|---------------|--------------------------|
-| Interface     | Streamlit                |
-| Modèle IA     | scikit-learn MLPRegressor|
-| Visualisation | Plotly                   |
-| Data          | Pandas / NumPy           |
-| Sérialisation | joblib                   |
-
----
-
-## 📋 Compatibilité
-
-Les fichiers `.pkl` ont été générés avec **scikit-learn 1.6.1** et **NumPy 2.x**
-sous Google Colab. Un patch de compatibilité automatique est appliqué au démarrage
-(`src/utils/patch_numpy.py`).
