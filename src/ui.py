@@ -268,7 +268,7 @@ hr { border-color: var(--border-subtle) !important; margin: 1rem 0 !important; }
 @media (max-width: 1024px) {
     .kpi-grid { grid-template-columns: 1fr; gap: 8px; border: none; background: transparent; }
     .kpi-cell { border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); }
-    .app-header { flex-direction: column; align-items: flex-start; gap: 1rem; padding: 1rem; }
+    .app-header { flex-direction: column; align-items: flex-start; gap: 1rem; padding: 1rem; padding-top: 3.5rem; }
     .header-right { width: 100%; justify-content: space-between; flex-wrap: wrap; }
     .header-stat { text-align: left; }
     .main-wrapper { padding: 1rem; }
@@ -276,10 +276,10 @@ hr { border-color: var(--border-subtle) !important; margin: 1rem 0 !important; }
 }
 
 /* ── STREAMLIT CLEANUP ── */
-#MainMenu, footer, header { visibility: hidden !important; }
+#MainMenu, footer { visibility: hidden !important; }
+header { background-color: transparent !important; }
 .stDeployButton { display: none !important; }
 .stPlotlyChart  { padding: 0 !important; }
-</style>
 """, unsafe_allow_html=True)
 
 
