@@ -22,13 +22,21 @@ propulsée par un modèle **MLPRegressor** entraîné sur les données de valida
 L'environnement est isolé et standardisé pour intégrer les fichiers de modèle fournis par Aurel :
 
 ```text
-yboost_local/
-├── Dockerfile                  # Recette de construction du conteneur Linux
-├── requirements.txt            # Dépendances Python strictes (alignées sur Colab)
-├── app.py                      # Point d'entrée de l'application Streamlit (épuré)
-└── models/                     # Artefacts d'apprentissage automatique
-    ├── meilleur_modele_rera.pkl # Modèle MLPRegressor entraîné (Aurel)
-    └── scaler_rera.pkl         # Scaler pour la normalisation des entrées (Aurel)
+Yboost-B2/
+
+├── Dockerfile            # Recette de construction de l'image de production Linux
+├── requirements.txt      # Dépendances Python strictes alignées sur l'environnement IA
+├── app.py                # Orchestrateur de l'application (point d'entrée Streamlit)
+├── assets/               # Ressources statiques et graphiques
+│   └── RER_1.png         # Logo RER A
+├── models/               # Fichiers de sérialisation d'Intelligence Artificielle
+│   ├── meilleur_modele_rera.pkl  # Modèle prédictif MLPRegressor 
+│   └── scaler_rera.pkl           # StandardScaler pour la normalisation
+├── src/                  # Code source applicatif
+│   ├── utils/            # Fonctions utilitaires et scripts d'aide
+│   ├── config.py         # Constantes, dictionnaires et configurations globales
+│   ├── model.py          # Logique de chargement des fichiers pkl et prédictions
+│   └── ui.py             # Structure des vues et mise en page principale
 ```
 
 ---
